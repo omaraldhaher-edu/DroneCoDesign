@@ -1,18 +1,11 @@
-# Racing Drone Co-Design
-
-This project co-designs a racing quadrotor and its controller. An outer-loop optimizer proposes drone designs (arm length, motors, battery, props), and an inner loop trains an RL controller for each design in a GPU-parallel simulator and reports lap time back. The full roadmap is in [`Co-Design Plan Racing Drone + RL Controller.pdf`](Co-Design%20Plan%20Racing%20Drone%20+%20RL%20Controller.pdf).
-
-**Current status: Phase 1 (simulator + parametric drone model) is set up.** There is no RL yet. A hand-written controller flies the drone so the simulator can be checked end to end.
-
-![Simulated quad flying a six-gate figure-eight: overview, chase and FPV cameras](docs/demo.png)
 
 ## What it can do right now
 
-- **Build a drone from design parameters.** `DroneDesign` (arm length, component masses, prop size, max thrust per motor, yaw torque coefficient, motor time constant) becomes a MuJoCo model. Mass and inertia are computed from the geometry, so changing one parameter changes the dynamics consistently. A basic feasibility check flags overlapping props and a thrust-to-weight ratio below 2.
+- **Build a drone from design parameters.** `DroneDesign` (arm length, component masses, prop size, max thrust per motor, yaw torque coefficient, motor time constant) becomes a MuJoCo model. Mass and inertia are computed from the geometry.
 - **Fly a race track.** A six-gate figure-eight track (18 m × 9 m, 1.5 m gates). A cascaded controller follows a smooth reference through every gate, and gate passes are detected and logged. The default 5" design (556 g, thrust-to-weight 6.6) completes laps at a 9 s lap time.
 - **Render it.** Headless MP4 with three cameras (overview, chase, onboard FPV) plus a PNG snapshot, or an interactive 3D viewer.
 - **Run thousands of drones on the GPU, each with its own design.** MJX steps a batch of quads where every environment has a different mass and arm length. Measured: 4,096 environments at about 0.8 M physics steps/s on an RTX 3070 Ti Laptop GPU, about 1,600× real time.
-- **Talk ROS 2.** A ROS 2 Jazzy node publishes odometry, IMU, TF, the flown path, and gate markers for RViz. It accepts `(collective thrust, body rates)` commands, the same action interface the RL policy will use. *This bridge is written but has not been run yet; see [Status](#status-and-known-limits).*
+- **Talk ROS 2.** A ROS 2 Jazzy node publishes odometry, IMU, TF, the flown path, and gate markers for RViz. It accepts `(collective thrust, body rates)` commands, the same action interface the RL policy will use. 
 
 ## Why MuJoCo + MJX
 
@@ -133,17 +126,17 @@ DroneDesign ──build_mjcf()──▶ MuJoCo model ──▶ QuadSim.step():  
 
 ## Status and known limits
 
-- **ROS 2 bridge not yet run end to end.** It compiles, but ROS wasn't installed on the dev machine yet.
-- **Physics is simplified.** There is no battery model, no thrust-vs-RPM/voltage curves, and only MuJoCo's basic body drag (disabled in MJX, which doesn't support it with the `implicitfast` integrator). Plan Phase 1 adds these.
-- **The controller is a hand-written stand-in**, not a racing policy. RL training is Phase 2.
+- **ROS 2 bridge not yet run end to end.** It compiles, but ROS wasn't tested yet.
+- **Physics is simplified.** There is no battery model, no thrust-vs-RPM/voltage curves, and only MuJoCo's basic body drag (disabled in MJX, which doesn't support it with the `implicitfast` integrator). 
+- **The controller is a hand-written stand-in**, not a racing policy.
 
-### Setup and rendering gotchas
+### Setup and rendering issues
 
 - **Rendering in WSL2 falls back to CPU (llvmpipe)**, about 40 ms per 720p frame. Training doesn't render, so this only affects videos.
 - **JAX can run out of GPU memory** when another program is using the GPU. Run with `XLA_PYTHON_CLIENT_PREALLOCATE=false`; `mjx_parallel_check.py` sets this for you.
 - **On Linux, headless rendering uses `MUJOCO_GL=egl`.** It must be set before `import mujoco`; `render_demo.py` handles this.
 
-## Next steps (from the plan)
+## Next steps
 
 1. **Phase 1:** a realistic motor/prop/battery/drag model and a parts database, plus sanity checks (hover throttle, thrust-to-weight, top speed, flight time).
 2. **Phase 2:** PPO in MJX on the fixed design and track, with the action space `(collective thrust, body rates)`, benchmarked against a time-optimal reference.
