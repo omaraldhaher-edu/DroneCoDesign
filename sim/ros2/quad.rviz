@@ -1,0 +1,57 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/Grid
+      Name: Grid
+      Enabled: true
+      Cell Size: 1
+      Plane Cell Count: 40
+      Reference Frame: world
+    - Class: rviz_default_plugins/TF
+      Name: TF
+      Enabled: true
+      Marker Scale: 0.5
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Gates
+      Enabled: true
+      Topic:
+        Value: /track/gates
+        Durability Policy: Transient Local
+    - Class: rviz_default_plugins/MarkerArray
+      Name: Quad
+      Enabled: true
+      Topic:
+        Value: /quad/model
+    - Class: rviz_default_plugins/Path
+      Name: Path
+      Enabled: true
+      Color: 25; 230; 255
+      Line Style: Billboards
+      Line Width: 0.04
+      Topic:
+        Value: /quad/path
+    - Class: rviz_default_plugins/Image
+      Name: FPV
+      Enabled: false
+      Topic:
+        Value: /quad/fpv/image_raw
+  Global Options:
+    Fixed Frame: world
+    Background Color: 30; 32; 40
+    Frame Rate: 30
+  Tools:
+    - Class: rviz_default_plugins/MoveCamera
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 26
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 2
+      Pitch: 0.6
+      Yaw: -1.57
+      Target Frame: world

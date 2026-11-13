@@ -1,0 +1,10 @@
+# Tested 2026-11 on Ubuntu 24.04 (WSL2), Python 3.12, RTX 3070 Ti Laptop.
+# This installs the CPU build of JAX. On a machine with an NVIDIA GPU, also run:
+#   pip install "jax[cuda12]==0.12.0.1"
+mujoco==4.0.0
+mujoco-mjx==4.0.0
+jax==0.12.0.1
+numpy==2.5.4
+imageio
+imageio-ffmpeg
+pyyaml
